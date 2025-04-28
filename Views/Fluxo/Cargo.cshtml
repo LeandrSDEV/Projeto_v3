@@ -1,0 +1,47 @@
+﻿@{
+    ViewData["Title"] = "Prefeitura";
+    var valores = ViewBag.Valores as List<string>;
+}
+
+<div class="container mt-5">
+    <h2 class="text-center">PREFEITURA</h2>
+    <br />
+
+    <form asp-controller="Fluxo" asp-action="SalvarCargo" method="post">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th class="text-center">Valor</th>
+                    <th class="text-center">Novo Valor</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (valores != null && valores.Any())
+                {
+                    for (int i = 0; i < valores.Count; i++)
+                    {
+                        <tr>
+                            <td class="text-center">
+                                @valores[i]
+                                <input type="hidden" name="ValoresAntigos[@i]" value="@valores[i]" />
+                            </td>
+                            <td class="text-center">
+                                <input type="text" name="NovosValores[@i]" class="form-control" placeholder="Digite o novo valor" />
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="2" class="text-center">Nenhum valor encontrado.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-success">Salvar Alterações</button>
+        </div>
+    </form>
+</div>

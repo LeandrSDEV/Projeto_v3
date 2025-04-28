@@ -1,0 +1,25 @@
+﻿@model DiscrepanciaModel
+
+@{
+    ViewData["Title"] = "Discrepâncias de Arquivos";
+}
+
+<div class="container mt-5">
+    <h2 class="text-center">Quantidades de Discrepâncias</h2>
+
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <div class="alert alert-danger text-center">
+            @ViewBag.ErrorMessage
+        </div>
+    }
+
+    <div id="quantidadeDiscrepancias" class="text-center">
+        <p><strong>Servidor:</strong> @Model.Servidor linhas</p>
+        <p><strong>Matrícula:</strong> @Model.Matricula linhas</p>
+        <p><strong>Categoria:</strong> @Model.Categoria linhas</p>
+        <p><strong>Secretarias:</strong> @Model.Secretaria linhas</p>
+        <p><strong>Perfil de Cálculo:</strong> @Model.PerfilCalculo linhas</p>
+    </div>
+</div>
+

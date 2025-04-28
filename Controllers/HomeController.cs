@@ -1,6 +1,6 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using Servidor_V3.Models;
+using Servidor_V3.Models.ErrorsModels;
 
 namespace Servidor_V3.Controllers
 {

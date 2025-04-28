@@ -1,0 +1,45 @@
+﻿@{
+    ViewData["Title"] = "Perfil de Cálculo";
+    var valoresDistintos = ViewBag.ValoresDistintos as List<string>;
+}
+
+<div class="container mt-5">
+    <h2 class="text-center">PERFIL DE CÁLCULO</h2>
+
+    <form asp-controller="Fluxo" asp-action="SalvarCalculo" method="post">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th class="text-center">Valor</th>
+                    <th class="text-center">Novo Valor</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (valoresDistintos != null && valoresDistintos.Any())
+                {
+                    foreach (var valor in valoresDistintos)
+                    {
+                        var valorOriginal = valor.Split(" - ")[0];
+                        <tr>
+                            <td class="text-center">@valor</td>
+                            <td class="text-center">
+                                <input type="text" name="NovosValores[@valorOriginal]" class="form-control" placeholder="Digite o novo valor" />
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="2" class="text-center">Nenhum valor encontrado.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="text-center mt-4">
+            <!-- Botão agora com type="submit" para enviar o formulário -->
+            <button type="submit" class="btn btn-success">Salvar Alterações</button>
+        </div>
+    </form>
+</div>

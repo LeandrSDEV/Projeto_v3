@@ -1,4 +1,4 @@
-namespace Servidor_V3.Models
+namespace Servidor_V3.Models.ErrorsModels
 {
     public class ErrorViewModel
     {
