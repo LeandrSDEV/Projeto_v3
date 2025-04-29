@@ -3,41 +3,129 @@
     var valoresDistintos = ViewBag.ValoresDistintos as List<string>;
 }
 
-<div class="container mt-5">
-    <h2 class="text-center">CATEGORIA</h2>
+<div class="bodylayout-categoria">
+    <div class="content-container-categoria">
+        <h2 class="text-center mb-4">CATEGORIA</h2>
 
-    <form asp-controller="Fluxo" asp-action="SalvarCategoria" method="post" id="categoriaForm">
-        <table class="table table-bordered table-striped">
-            <thead>
-                <tr>
-                    <th class="text-center">Valor</th>
-                    <th class="text-center">Novo Valor</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (valoresDistintos != null && valoresDistintos.Any())
-                {
-                    foreach (var valor in valoresDistintos)
+        <form asp-controller="Fluxo" asp-action="SalvarCategoria" method="post" id="categoriaForm">
+            <table class="table table-bordered table-hover">
+                <thead class="thead-light">
+                    <tr>
+                        <th class="text-center">Valor</th>
+                        <th class="text-center">Novo Valor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (valoresDistintos != null && valoresDistintos.Any())
+                    {
+                        foreach (var valor in valoresDistintos)
+                        {
+                            <tr>
+                                <td class="text-center align-middle">
+                                    @valor
+                                </td>
+                                <td class="text-center align-middle">
+                                    <input type="text" name="NovosValores[@valor]" class="form-control input-estilizado" placeholder="Digite o novo valor" />
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
                     {
                         <tr>
-                            <td class="text-center">@valor</td>
-                            <td class="text-center">
-                                <input type="text" name="NovosValores[@valor]" class="form-control" placeholder="Digite o novo valor" />
-                            </td>
+                            <td colspan="2" class="text-center">Nenhum valor encontrado.</td>
                         </tr>
                     }
-                }
-                else
-                {
-                    <tr>
-                        <td colspan="2" class="text-center">Nenhum valor encontrado.</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+                </tbody>
+            </table>
 
-        <div class="text-center mt-4">
-            <button type="submit" class="btn btn-success">Salvar Alterações</button>
-        </div>
-    </form>
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-gradient">Salvar Alterações</button>
+            </div>
+        </form>
+    </div>
 </div>
+
+<style>
+    body {
+        background: linear-gradient(to bottom, #0d6efd, #000); /* azul para preto */
+    }
+    /* Fundo principal */
+    .bodylayout-categoria {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 90vh;
+        background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        border-radius: 15px;
+        padding: 20px;
+    }
+
+    /* Container */
+    .content-container-categoria {
+        width: 65%;
+        background: #fff;
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Título */
+    h2 {
+        font-weight: bold;
+        color: #333;
+    }
+
+    /* Tabela */
+    .table {
+        margin-top: 20px;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    th {
+        background: #2575fc;
+        color: white;
+        font-size: 1rem;
+        text-align: center;
+    }
+
+    td {
+        vertical-align: middle;
+        font-size: 0.95rem;
+    }
+
+    /* Inputs */
+    .input-estilizado {
+        width: 80%;
+        padding: 10px;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        transition: all 0.3s ease;
+        margin: 0 auto;
+    }
+
+        .input-estilizado:focus {
+            border-color: #6a11cb;
+            box-shadow: 0 0 8px rgba(106, 17, 203, 0.3);
+            outline: none;
+        }
+
+    /* Botão */
+    .btn-gradient {
+        background: linear-gradient(90deg, #2575fc, #6a11cb);
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        font-size: 1rem;
+        font-weight: bold;
+        border-radius: 12px;
+        transition: all 0.4s ease;
+    }
+
+        .btn-gradient:hover {
+            background: linear-gradient(90deg, #6a11cb, #2575fc);
+            box-shadow: 0 4px 12px rgba(106, 17, 203, 0.4);
+        }
+</style>

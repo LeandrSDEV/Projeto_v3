@@ -4,22 +4,104 @@
     ViewData["Title"] = "Discrepâncias de Arquivos";
 }
 
-<div class="container mt-5">
-    <h2 class="text-center">Quantidades de Discrepâncias</h2>
+<div class="bodylayout-discrepancias">
+    <div class="content-container-discrepancias">
+        <h2 class="text-center mb-4">QUANTIDADES DE DISCREPÂNCIAS</h2>
 
-    @if (ViewBag.ErrorMessage != null)
-    {
-        <div class="alert alert-danger text-center">
-            @ViewBag.ErrorMessage
+        @if (ViewBag.ErrorMessage != null)
+        {
+            <div class="alert alert-danger text-center">
+                @ViewBag.ErrorMessage
+            </div>
+        }
+
+        <div id="quantidadeDiscrepancias" class="text-center">
+            <p class="discrepancia-item"><strong>Servidor:</strong> @Model.Servidor linhas</p>
+            <p class="discrepancia-item"><strong>Matrícula:</strong> @Model.Matricula linhas</p>
+            <p class="discrepancia-item"><strong>Categoria:</strong> @Model.Categoria linhas</p>
+            <p class="discrepancia-item"><strong>Secretarias:</strong> @Model.Secretaria linhas</p>
+            <p class="discrepancia-item"><strong>Perfil de Cálculo:</strong> @Model.PerfilCalculo linhas</p>
         </div>
-    }
-
-    <div id="quantidadeDiscrepancias" class="text-center">
-        <p><strong>Servidor:</strong> @Model.Servidor linhas</p>
-        <p><strong>Matrícula:</strong> @Model.Matricula linhas</p>
-        <p><strong>Categoria:</strong> @Model.Categoria linhas</p>
-        <p><strong>Secretarias:</strong> @Model.Secretaria linhas</p>
-        <p><strong>Perfil de Cálculo:</strong> @Model.PerfilCalculo linhas</p>
+        <div class="text-center mt-4">
+            <button onclick="window.location.href='@Url.Action("Index", "Home")'" class="btn btn-primary">
+                Entendido
+            </button>
+        </div>
     </div>
 </div>
 
+<style>
+    body {
+        background: linear-gradient(to bottom, #0d6efd, #000); /* azul para preto */
+    }
+    /* Fundo principal */
+    .bodylayout-discrepancias {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 90vh;
+        background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        border-radius: 15px;
+        padding: 20px;
+    }
+
+    /* Container */
+    .content-container-discrepancias {
+        width: 70%;
+        background: #fff;
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Título */
+    h2 {
+        font-weight: bold;
+        color: #333;
+        font-size: 2rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    /* Mensagem de erro */
+    .alert {
+        font-size: 1.1rem;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 10px;
+    }
+
+    /* Discrepâncias */
+    #quantidadeDiscrepancias {
+        margin-top: 30px;
+    }
+
+    .discrepancia-item {
+        font-size: 1.2rem;
+        color: #333;
+        margin: 10px 0;
+    }
+
+    .discrepancia-item strong {
+        color: #2575fc;
+        font-weight: bold;
+    }
+
+    /* Botão */
+    .btn-gradient {
+        background: linear-gradient(90deg, #2575fc, #6a11cb);
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        font-size: 1rem;
+        font-weight: bold;
+        border-radius: 12px;
+        transition: all 0.4s ease;
+    }
+
+    .btn-gradient:hover {
+        background: linear-gradient(90deg, #6a11cb, #2575fc);
+        box-shadow: 0 4px 12px rgba(106, 17, 203, 0.4);
+    }
+</style>

@@ -41,36 +41,40 @@ namespace Servidor_V3.Controllers
         [HttpPost]
         public async Task<IActionResult> ProcessarArquivo(IFormFile arquivoTxt, IFormFile arquivoExcel, int SelectOptionId)
         {
-            if (arquivoTxt == null || arquivoTxt.Length == 0 || arquivoExcel == null || arquivoExcel.Length == 0)
+            try
             {
-                return Json(new { success = false, message = "Erro nos arquivos enviados. Por favor, envie arquivos válidos." });
-            }
+                if (arquivoTxt == null || arquivoTxt.Length == 0 || arquivoExcel == null || arquivoExcel.Length == 0)
+                {
+                    return Json(new { success = false, message = "Erro nos arquivos enviados. Por favor, envie arquivos válidos." });
+                }
 
-            if (SelectOptionId == 0)
+                if (SelectOptionId == 0)
+                {
+                    return Json(new { success = false, message = "Selecione um município válido." });
+                }
+
+                var selectOptionFromDb = await _bancoContext.SelectOptions
+                    .FirstOrDefaultAsync(x => x.Id == SelectOptionId);
+
+                if (selectOptionFromDb == null)
+                {
+                    return Json(new { success = false, message = "Município não encontrado no banco de dados." });
+                }
+
+                var contracheque = await ProcessarArquivoTxt(arquivoTxt, selectOptionFromDb);
+                var administrativo = await ProcessarArquivoExcel(arquivoExcel);
+
+                if (contracheque.Any()) _bancoContext.Contracheque.AddRange(contracheque);
+                if (administrativo.Any()) _bancoContext.Administrativo.AddRange(administrativo);
+                await _bancoContext.SaveChangesAsync();
+
+                return Ok();
+            }
+            catch (Exception ex)
             {
-                return Json(new { success = false, message = "Selecione um município válido." });
+                return Json(new { success = false, message = ex.Message, detail = ex.InnerException?.Message });
             }
-
-            var selectOptionFromDb = await _bancoContext.SelectOptions
-                .FirstOrDefaultAsync(x => x.Id == SelectOptionId);
-
-            if (selectOptionFromDb == null)
-            {
-                return Json(new { success = false, message = "Município não encontrado no banco de dados." });
-            }
-
-            // Processar os arquivos
-            var contracheque = await ProcessarArquivoTxt(arquivoTxt, selectOptionFromDb);
-            var administrativo = await ProcessarArquivoExcel(arquivoExcel);
-
-            // Salvar os dados no banco
-            if (contracheque.Any()) _bancoContext.Contracheque.AddRange(contracheque);
-            if (administrativo.Any()) _bancoContext.Administrativo.AddRange(administrativo);
-            await _bancoContext.SaveChangesAsync();
-
-            return Ok();
         }
-
 
         private async Task<List<ContrachequeModel>> ProcessarArquivoTxt(IFormFile arquivoTxt, SelectOptionModel selectOptionFromDb)
         {

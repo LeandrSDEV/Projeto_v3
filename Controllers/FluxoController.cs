@@ -170,36 +170,47 @@ namespace Servidor_V3.Controllers
         [HttpGet]
         public async Task<IActionResult> Calculo()
         {
-            var categorias = new Dictionary<string, string>
-{
-    { "1", "Pensionista" }, { "2", "Efetivo" }, { "3", "Militar" }, { "4", "Aposentado" },
-    { "5", "Contratado" }, { "6", "Prestador de Serviço" }, { "7", "Comissionado" },
-    { "8", "Estagiario" }, { "9", "Celetista" }, { "10", "Estatutario" }, { "11", "Temporario" },
-    { "12", "Beneficiario" }, { "13", "Agente Politico" }, { "14", "Aguardando Especificar" },
-    { "15", "Efetivo/Comissão" }, { "16", "Estável" }, { "17", "CConselheiro Tutelar" },
-    { "18", "Regime Administrativo" }, { "19", "Trabalhador Avulso" }, { "20", "Pensão por Morte" },
-    { "21", "Interesse Público" }, { "22", "Emprego Público" }, { "23", "Reintegração" },
-    { "24", "Regime Jurídico" }, { "25", "Contratado/Comissionado" }, { "26", "Sem Categoria" },
-    { "27", "Pensão Alimenticia" }, { "28", "Inativo" }, { "29", "Função Pública Relevante" },
-    { "30", "Pensão Especial" }, { "31", "Efetivo/Cedido" }, { "32", "Avulsos" }, { "33", "Cedido" },
-    { "34", "Autônomo" }, { "35", "Comissionado/Estatutário" }, { "36", "Temporário/Estatutário" },
-    { "37", "Concursado" }, { "38", "Contribuinte Individual" }, { "39", "Eletivo" },
-    { "41", "Estatutário/Agente Político" }, { "42", "Auxílio" }, { "48", "Bolsa Auxílio" },
-    { "49", "Temporário - CLT" }, { "51", "Prefeito" }, { "52", "Tutelar" }
-};
+            var dicionarioCcoluna16 = new Dictionary<string, string>
+    {
+        { "1", "Pensionista" }, { "2", "Efetivo" }, { "3", "Militar" }, { "4", "Aposentado" },
+        { "5", "Contratado" }, { "6", "Prestador de Serviço" }, { "7", "Comissionado" },
+        { "8", "Estagiario" }, { "9", "Celetista" }, { "10", "Estatutario" }, { "11", "Temporario" },
+        { "12", "Beneficiario" }, { "13", "Agente Politico" }, { "14", "Aguardando Especificar" },
+        { "15", "Efetivo/Comissão" }, { "16", "Estável" }, { "17", "CConselheiro Tutelar" },
+        { "18", "Regime Administrativo" }, { "19", "Trabalhador Avulso" }, { "20", "Pensão por Morte" },
+        { "21", "Interesse Público" }, { "22", "Emprego Público" }, { "23", "Reintegração" },
+        { "24", "Regime Jurídico" }, { "25", "Contratado/Comissionado" }, { "26", "Sem Categoria" },
+        { "27", "Pensão Alimenticia" }, { "28", "Inativo" }, { "29", "Função Pública Relevante" },
+        { "30", "Pensão Especial" }, { "31", "Efetivo/Cedido" }, { "32", "Avulsos" }, { "33", "Cedido" },
+        { "34", "Autônomo" }, { "35", "Comissionado/Estatutário" }, { "36", "Temporário/Estatutário" },
+        { "37", "Concursado" }, { "38", "Contribuinte Individual" }, { "39", "Eletivo" },
+        { "41", "Estatutário/Agente Político" }, { "42", "Auxílio" }, { "48", "Bolsa Auxílio" },
+        { "49", "Temporário - CLT" }, { "51", "Prefeito" }, { "52", "Tutelar" }
+    };
 
-            var valoresCcoluna16 = await _bancoContext.Contracheque
-                .Select(x => x.Ccoluna16)
-                .Distinct()
-                .ToListAsync();
+            var dados = await _bancoContext.Contracheque
+            .Select(x => new
+            {
+                Ccoluna1 = x.Ccoluna1,
+                Ccoluna16 = x.Ccoluna16,
+                Ccoluna18 = x.Ccoluna18
+            })
+            .Distinct()
+            .ToListAsync();
 
-            var valoresFormatados = valoresCcoluna16
-                .Select(valor => $"{valor} - {categorias.GetValueOrDefault(valor, "DESCONHECIDO")}")
+            // Agrupar os dados para que Ccoluna1 e Ccoluna16 sejam únicos, e a Ccoluna18 seja definida conforme a combinação dessas duas
+            var dadosAgrupados = dados.GroupBy(x => new { x.Ccoluna1, x.Ccoluna16 })
+                .Select(group => new CalculoViewModel
+                {
+                    Ccoluna1Original = group.Key.Ccoluna1, // mantém o valor original de Ccoluna1
+                    Ccoluna1Exibicao = group.Key.Ccoluna1.ToString(), // exibe Ccoluna1 como está (sem dicionário)
+                    Ccoluna16 = group.Key.Ccoluna16, // mantém o valor original de Ccoluna16 (sem alteração no banco)
+                    Ccoluna16Exibicao = dicionarioCcoluna16.GetValueOrDefault(group.Key.Ccoluna16.ToString(), group.Key.Ccoluna16.ToString()), // valor exibido no dicionário ou o original
+                    Ccoluna18Atual = group.Select(g => g.Ccoluna18).FirstOrDefault() // Define Ccoluna18 como o valor único relacionado à combinação Ccoluna1 + Ccoluna16
+                })
                 .ToList();
 
-            ViewBag.ValoresDistintos = valoresFormatados;
-
-            return View();
+            return View(dadosAgrupados);
         }
 
         [HttpPost]
@@ -211,45 +222,48 @@ namespace Servidor_V3.Controllers
             }
 
             int totalAlterados = 0;
-            List<string> valoresAlterados = new List<string>(); // Lista para armazenar os valores alterados
+            List<string> valoresAlterados = new List<string>();
 
-            // Inicia a transação
             using (var transaction = await _bancoContext.Database.BeginTransactionAsync())
             {
                 try
                 {
-                    // Percorre cada item enviado
                     foreach (var item in NovosValores)
                     {
-                        var valorOriginal = item.Key.Trim();
+                        var chaveComposta = item.Key.Trim();
                         var novoValor = item.Value.Trim();
 
-                        // Verifica se o valor original não está vazio e o novo valor é válido
-                        if (string.IsNullOrEmpty(valorOriginal) || string.IsNullOrEmpty(novoValor))
+                        if (string.IsNullOrEmpty(chaveComposta) || string.IsNullOrEmpty(novoValor))
                         {
-                            continue; // Ignora entradas com valores inválidos
+                            continue;
                         }
 
-                        // Realiza a atualização
+                        var partes = chaveComposta.Split('|');
+                        if (partes.Length != 2)
+                        {
+                            continue;
+                        }
+
+                        var ccoluna1 = partes[0].Trim(); // mantemos como string
+                        var ccoluna16 = partes[1].Trim(); // mantemos como string
+
                         var alterados = await _bancoContext.Contracheque
-                            .Where(x => x.Ccoluna16 == valorOriginal)
+                            .Where(x => x.Ccoluna1 == ccoluna1 && x.Ccoluna16 == ccoluna16)
                             .ExecuteUpdateAsync(setters => setters.SetProperty(x => x.Ccoluna18, novoValor));
 
-                        // Verifica se algum valor foi alterado
                         if (alterados > 0)
                         {
-                            valoresAlterados.Add($"Valor {valorOriginal} alterado para {novoValor}");
+                            valoresAlterados.Add($"Valor {ccoluna1} | {ccoluna16} alterado para {novoValor}");
                         }
 
                         totalAlterados += alterados;
                     }
 
-                    // Se algum valor foi alterado, realiza o commit
                     if (totalAlterados > 0)
                     {
                         await transaction.CommitAsync();
 
-                        // Chama os serviços após a atualização
+                        // Chama os serviços necessários após a alteração
                         await _servidorService.GerarEncontradoAsync();
                         await _matriculaService.GerarMatriculasAsync();
                         await _categoriaService.GerarVinculoAsync();
@@ -257,22 +271,27 @@ namespace Servidor_V3.Controllers
                         await _perfilCalculo.GeradorPerfilCalculo();
                         await _cleanupService.LimparTabelasAsync();
 
-                        // Redireciona para a view Discrepancia após sucesso
                         return RedirectToAction("Discrepancia");
                     }
                     else
                     {
-                        // Caso nenhum valor tenha sido alterado, ainda redireciona para a view Discrepancia
                         return RedirectToAction("Discrepancia");
                     }
                 }
                 catch (Exception ex)
                 {
-                    // Caso ocorra erro, realiza o rollback e retorna erro com detalhes
                     await transaction.RollbackAsync();
                     return RedirectToAction("Discrepancia");
                 }
             }
+        }
+        public class CalculoViewModel
+        {
+            public string Ccoluna1Original { get; set; }
+            public string Ccoluna1Exibicao { get; set; } // Exibe Ccoluna1 diretamente
+            public string Ccoluna16 { get; set; } // Valor original de Ccoluna16 (não alterado)
+            public string Ccoluna16Exibicao { get; set; } // Exibe o valor descrito do dicionário para Ccoluna16
+            public string Ccoluna18Atual { get; set; }
         }
 
         //====================   DISCREPANCIA   ====================

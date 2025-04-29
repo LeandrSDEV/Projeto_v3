@@ -1,49 +1,192 @@
-﻿@model Servidor.Models.SelectOptionModel
+﻿<style>
 
-@{
-    ViewData["Title"] = "Atualização de Servidor";
-}
+    body {
+        background: linear-gradient(to bottom, #0d6efd, #000); /* azul para preto */
+        
+    }
+    /* Corpo da página */
+    .bodylayout1 {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 85vh;
+        background: linear-gradient(135deg, #f3f4f7, #d6e1f0);
+        font-family: 'Arial', sans-serif;
+        margin: -53px;
+        border-radius: 15px;
+        padding: 0;
+    }
+
+    .content-container {
+        display: flex;
+        width: 90%; /* Aumenta a largura da coluna */
+        height: 90%; /* Ajusta a altura para ocupar 90% da tela */
+        border-radius: 20px;
+        box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
+        background: #ffffff;
+        overflow: hidden;
+    }
+
+    /* Coluna da esquerda (Foto de perfil + Data/hora) */
+    .left-column {
+        background: linear-gradient(135deg, #6a11cb, #2575fc);
+        color: white;
+        width: 35%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 2px;
+        min-height: 100%;
+    }
+
+        .left-column img {
+            width: 180px;
+            height: 180px;
+            border-radius: 40%;
+            object-fit: cover;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.9);
+        }
+
+        .left-column h2 {
+            margin-top: 11px;
+            font-size: 1.4rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .left-column .datetime {
+            margin-top: 20px;
+            font-size: 1rem;
+            opacity: 0.8;
+            text-align: center;
+        }
+
+    /* Coluna da direita (Conteúdo do projeto) */
+    .right-column {
+        width: 65%;
+        margin-top: 50px;
+        padding: 30px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        min-height: 100%;
+    }
+
+    .form-label {
+        font-size: 1rem;
+        font-weight: bold;
+    }
+
+    .form-select, .form-control {
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        padding: 10px;
+        transition: all 0.3s ease-in-out;
+    }
+
+        .form-select:focus, .form-control:focus {
+            border-color: #2575fc;
+            box-shadow: 0 0 5px rgba(37, 117, 252, 0.5);
+        }
+
+    .btn-primary {
+        background: #2575fc;
+        border: none;
+        border-radius: 12px;
+        transition: all 0.6s ease;
+    }
+
+        .btn-primary:hover {
+            background: #6a11cb;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+    /* Animação para o modal */
+    .modal-dialog {
+        transform: scale(0.7);
+        animation: modal-animate 1s forwards;
+    }
+
+    /* Modal Fluxo */
+    .modal-header {
+        background: linear-gradient(45deg, #0d6efd, #6610f2);
+        color: white;
+        border-radius: 20px;
+    }
+
+    .btn-success, .btn-warning {
+        transition: all 0.3s ease;
+        border-radius: 10px;
+    }
+
+        .btn-success:hover {
+            background: #28a745;
+            transform: scale(1.05);
+        }
+
+        .btn-warning:hover {
+            background: #fd7e14;
+            transform: scale(1.05);
+        }
+</style>
 
 <br />
 <br />
 <div class="bodylayout1">
-    <h3 class="display-3 my-3 text-center">ATUALIZAÇÃO DE SERVIDOR</h3>
-
-    <br />
-    <form asp-controller="Arquivos" asp-action="ProcessarArquivo" method="post" enctype="multipart/form-data">
-        <div class="w-50 my-3 m-auto">
-            <label for="SelectOption" class="form-label">Município:</label>
-            <select id="SelectOption" name="SelectOptionId" class="form-select">
-                <option value=""> < --- Selecione o município  --- ></option>
-                @foreach (var item in ViewBag.Statuses as List<SelectListItem>)
-                {
-                    <option value="@item.Value">@item.Text</option>
-                }
-            </select>
-        </div>
-        <br />
-        <div class="d-flex justify-content-between">
-            <div class="txtcss">
-                <label for="arquivoTxt" class="form-label">Arquivo Contracheque:</label>
-                <input type="file" id="arquivoTxt" name="arquivoTxt" accept=".txt" class="form-control" />
-            </div>
-
-            <div class="excelcss">
-                <label for="arquivoExcel" class="form-label">Arquivo Administrador:</label>
-                <input type="file" id="arquivoExcel" name="arquivoExcel" accept=".xls" class="form-control" />
+    <div class="content-container">
+        <!-- Coluna da Esquerda (Foto de perfil e Data/Hora) -->
+        <div class="left-column">
+            <img src="./css/cac.jpeg" alt="Foto de perfil">
+            <h2>Não desista de algo quando falarem que você não é capaz. Levante-se e mostre que estão enganados.</h2>
+            <div class="datetime" id="datetime">
+                <!-- Data e hora dinâmica -->
             </div>
         </div>
 
-        <br />
-        <br />
-        <br />
+        <!-- Coluna da Direita (Conteúdo do formulário) -->
+        <div class="right-column">
+            <h3 class="display-3 my-3 text-center">ATUALIZAÇÃO DE SERVIDOR</h3>
 
-        <div class="text-center">
-            <button type="submit" class="btn btn-primary w-25" id="btnProcessar">Processar</button>
+            <br />
+            <form asp-controller="Arquivos" asp-action="ProcessarArquivo" method="post" enctype="multipart/form-data">
+                <div class="w-50 my-3 m-auto">
+                    <label for="SelectOption" class="form-label">Município:</label>
+                    <select id="SelectOption" name="SelectOptionId" class="form-select">
+                        <option value=""> < --- Selecione o município  --- ></option>
+                        @foreach (var item in ViewBag.Statuses as List<SelectListItem>)
+                        {
+                            <option value="@item.Value">@item.Text</option>
+                        }
+                    </select>
+                </div>
+
+                <br />
+                <div class="d-flex justify-content-center gap-5">
+                    <div class="txtcss" style="width: 45%;">
+                        <label for="arquivoTxt" class="form-label">Arquivo Contracheque:</label>
+                        <input type="file" id="arquivoTxt" name="arquivoTxt" accept=".txt" class="form-control" />
+                    </div>
+
+                    <div class="excelcss" style="width: 45%;">
+                        <label for="arquivoExcel" class="form-label">Arquivo Administrador:</label>
+                        <input type="file" id="arquivoExcel" name="arquivoExcel" accept=".xls" class="form-control" />
+                    </div>
+                </div>
+
+                <br />
+                <br />
+                <br />
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary w-25" id="btnProcessar">Processar</button>
+                </div>
+            </form>
         </div>
-    </form>
+    </div>
 </div>
 
+<!-- Modal Fluxo -->
 <div class="modal fade" id="modalFluxo" tabindex="-1" aria-labelledby="modalFluxoLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="border-radius: 20px; box-shadow: 0px 5px 15px rgba(0,0,0,0.3);">
@@ -52,7 +195,7 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
             </div>
             <div class="modal-body text-center">
-                <p class="fs-5">Qual fluxo deseja seguir?</p>
+                <p class="fs-5">A SECRETARIA É BASEADA EM</p>
                 <div class="d-flex justify-content-center gap-3">
                     <button type="button" class="btn btn-success btn-lg" id="btnPrefeitura">Prefeitura</button>
                     <button type="button" class="btn btn-warning btn-lg" id="btnCargo">Cargo</button>
@@ -61,3 +204,16 @@
         </div>
     </div>
 </div>
+
+<script>
+    // Atualiza a data e hora dinamicamente
+    function updateDateTime() {
+        var datetimeElement = document.getElementById('datetime');
+        var now = new Date();
+        var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+        datetimeElement.innerHTML = now.toLocaleDateString('pt-BR', options);
+    }
+
+    // Atualizar a data e hora a cada segundo
+    setInterval(updateDateTime, 1000);
+</script>
