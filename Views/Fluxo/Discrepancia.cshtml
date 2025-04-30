@@ -16,17 +16,51 @@
         }
 
         <div id="quantidadeDiscrepancias" class="text-center">
-            <p class="discrepancia-item"><strong>Servidor:</strong> @Model.Servidor linhas</p>
-            <p class="discrepancia-item"><strong>Matrícula:</strong> @Model.Matricula linhas</p>
-            <p class="discrepancia-item"><strong>Categoria:</strong> @Model.Categoria linhas</p>
-            <p class="discrepancia-item"><strong>Secretarias:</strong> @Model.Secretaria linhas</p>
-            <p class="discrepancia-item"><strong>Perfil de Cálculo:</strong> @Model.PerfilCalculo linhas</p>
+            <p class="discrepancia-item">
+                <strong>Servidor:</strong> @Model.Servidor linhas
+                @if (Model.Servidor > 0)
+                {
+                    <a href="@Url.Action("BaixarArquivo", "Fluxo", new { nome = "SERVIDOR.txt" })" class="btn btn-sm btn-outline-secondary ms-2">Baixar</a>
+                }
+            </p>
+            <p class="discrepancia-item">
+                <strong>Matrícula:</strong> @Model.Matricula linhas
+                @if (Model.Matricula > 0)
+                {
+                    <a href="@Url.Action("BaixarArquivo", "Fluxo", new { nome = "MATRICULA.txt" })" class="btn btn-sm btn-outline-secondary ms-2">Baixar</a>
+                }
+            </p>
+            <p class="discrepancia-item">
+                <strong>Categoria:</strong> @Model.Categoria linhas
+                @if (Model.Categoria > 0)
+                {
+                    <a href="@Url.Action("BaixarArquivo", "Fluxo", new { nome = "CATEGORIA.txt" })" class="btn btn-sm btn-outline-secondary ms-2">Baixar</a>
+                }
+            </p>
+            <p class="discrepancia-item">
+                <strong>Secretarias:</strong> @Model.Secretaria linhas
+                @if (Model.Secretaria > 0)
+                {
+                    <a href="@Url.Action("BaixarArquivo", "Fluxo", new { nome = "SECRETARIA.txt" })" class="btn btn-sm btn-outline-secondary ms-2">Baixar</a>
+                }
+            </p>
+            <p class="discrepancia-item">
+                <strong>Perfil de Cálculo:</strong> @Model.PerfilCalculo linhas
+                @if (Model.PerfilCalculo > 0)
+                {
+                    <a href="@Url.Action("BaixarArquivo", "Fluxo", new { nome = "PERFIL DE CALCULO.txt" })" class="btn btn-sm btn-outline-secondary ms-2">Baixar</a>
+                }
+            </p>
         </div>
+
         <div class="text-center mt-4">
-            <button onclick="window.location.href='@Url.Action("Index", "Home")'" class="btn btn-primary">
-                Entendido
-            </button>
+            <form method="post" action="@Url.Action("Finalizar", "Fluxo")">
+                <button type="submit" class="btn btn-primary">
+                    FINALIZAR
+                </button>
+            </form>
         </div>
+
     </div>
 </div>
 

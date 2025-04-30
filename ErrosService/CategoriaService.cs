@@ -42,9 +42,13 @@ public class CategoriaService
 
         if (discrepancias.Any())
         {
-            var desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            var filePath = Path.Combine(desktopPath, "CATEGORIA.txt");
+            var pasta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "discrepancias");
 
+            // Garante que a pasta exista
+            if (!Directory.Exists(pasta))
+                Directory.CreateDirectory(pasta);
+
+            var filePath = Path.Combine(pasta, "CATEGORIA.txt");
             using var writer = new StreamWriter(filePath);
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
@@ -71,7 +75,6 @@ public class CategoriaService
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
-                Console.WriteLine($"Arquivo salvo em: {filePath}");
             }
             catch (Exception ex)
             {

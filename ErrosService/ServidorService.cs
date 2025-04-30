@@ -88,8 +88,14 @@ public class ServidorService
                 Console.WriteLine($"Erro inesperado: {ex.Message}");
             }
 
-            // Gerar arquivo SERVIDOR.txt
-            var filePath = Path.Combine(_caminhoSaida, "SERVIDOR.txt");
+
+            var pasta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "discrepancias");
+           
+            // Garante que a pasta exista
+            if (!Directory.Exists(pasta))
+                Directory.CreateDirectory(pasta);
+
+            var filePath = Path.Combine(pasta, "SERVIDOR.txt");
             await using (var writer = new StreamWriter(filePath))
             {
                 foreach (var linha in discrepancias)
@@ -98,10 +104,6 @@ public class ServidorService
                 }
             }
 
-            Console.WriteLine($"Arquivo SERVIDOR.txt gerado com {discrepancias.Count} linhas em: {filePath}");
-        }
-        else
-        {
             Console.WriteLine("Nenhuma discrepância encontrada. Arquivo não gerado.");
         }
     }

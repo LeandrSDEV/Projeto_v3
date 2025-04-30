@@ -47,8 +47,12 @@ public class PerfilCalculo
             // Se não encontrar, ignora (não é considerado discrepância nesse cenário)
         }
 
-        var desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-        var filePath = Path.Combine(desktopPath, "PERFIL DE CALCULO.txt");
+        var pasta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "discrepancias");
+     
+        if (!Directory.Exists(pasta))
+            Directory.CreateDirectory(pasta);
+
+        var filePath = Path.Combine(pasta, "PERFIL DE CALCULO.txt");
 
         if (discrepancias.Any())
         {
@@ -68,14 +72,9 @@ public class PerfilCalculo
                     await writer.WriteLineAsync($"{cpf};{matricula};{valor}");
                     chavesRegistradas.Add(chaveUnica);
                 }
-            }
-
-            Console.WriteLine($"✅ Arquivo 'PERFIL DE CALCULO.txt' gerado com {chavesRegistradas.Count} discrepâncias únicas.");
-        }
-        else
-        {
-            Console.WriteLine("✅ Nenhuma discrepância de valor encontrada.");
-        }
+            }           
+        }      
+            Console.WriteLine("✅ Nenhuma discrepância de valor encontrada.");     
     }
 
     private int ExtrairNumeroInteiro(string input)

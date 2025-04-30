@@ -301,13 +301,13 @@ namespace Servidor_V3.Controllers
         {
             try
             {
-                var desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                var pasta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "discrepancias");
 
-                var servidorPath = Path.Combine(desktopPath, "SERVIDOR.txt");
-                var matriculaPath = Path.Combine(desktopPath, "MATRICULA.txt");
-                var categoriaPath = Path.Combine(desktopPath, "CATEGORIA.txt");
-                var secretariaPath = Path.Combine(desktopPath, "SECRETARIAS.txt");
-                var perfilCalculoPath = Path.Combine(desktopPath, "PERFIL DE CALCULO.txt");
+                var servidorPath = Path.Combine(pasta, "SERVIDOR.txt");
+                var matriculaPath = Path.Combine(pasta, "MATRICULA.txt");
+                var categoriaPath = Path.Combine(pasta, "CATEGORIA.txt");
+                var secretariaPath = Path.Combine(pasta, "SECRETARIA.txt");
+                var perfilCalculoPath = Path.Combine(pasta, "PERFIL DE CALCULO.txt");
 
                 int servidor = System.IO.File.Exists(servidorPath) ? System.IO.File.ReadAllLines(servidorPath).Length : 0;
                 int matricula = System.IO.File.Exists(matriculaPath) ? System.IO.File.ReadAllLines(matriculaPath).Length : 0;
@@ -324,15 +324,53 @@ namespace Servidor_V3.Controllers
                     PerfilCalculo = perfilCalculo
                 };
 
-                // Retorna a view com o modelo preenchido
                 return View(model);
             }
             catch (Exception ex)
             {
-                // Em caso de erro, exibe a mensagem de erro na View
                 ViewBag.ErrorMessage = "Erro ao carregar as discrepâncias: " + ex.Message;
                 return View();
             }
+        }
+
+        [HttpGet]
+        public IActionResult BaixarArquivo(string nome)
+        {
+            var pasta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "discrepancias");
+            var caminho = Path.Combine(pasta, nome);
+
+            if (!System.IO.File.Exists(caminho))
+                return NotFound();
+
+            var bytes = System.IO.File.ReadAllBytes(caminho);
+            return File(bytes, "text/plain", nome);
+        }
+
+        [HttpPost]
+        public IActionResult Finalizar()
+        {
+            var pastaDiscrepancias = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "discrepancias");
+
+            if (Directory.Exists(pastaDiscrepancias))
+            {
+                // Exclui todas as subpastas e seus conteúdos
+                var pastas = Directory.GetDirectories(pastaDiscrepancias);
+                foreach (var pasta in pastas)
+                {
+                    try
+                    {
+                        Directory.Delete(pasta, true); // true para deletar com conteúdo
+                    }
+                    catch (Exception ex)
+                    {
+                        // Log de erro, caso a exclusão falhe
+                        Console.WriteLine($"Erro ao deletar pasta: {ex.Message}");
+                    }
+                }
+            }
+
+            // Redireciona para a tela inicial ou outra view após excluir as pastas
+            return RedirectToAction("Index", "Home");
         }
 
     }

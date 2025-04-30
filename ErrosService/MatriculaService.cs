@@ -91,10 +91,14 @@ public class MatriculaService
         // Etapa 7: Gerar o arquivo de discrepâncias apenas se houver conteúdo
         if (discrepancias.Any())
         {
-            var desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            var filePath = Path.Combine(desktopPath, "MATRICULA.txt");
+            var pasta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "discrepancias");
 
-            await using (var writer = new StreamWriter(filePath))
+            // Garante que a pasta exista
+            if (!Directory.Exists(pasta))
+                Directory.CreateDirectory(pasta);
+
+            var filePath = Path.Combine(pasta, "MATRICULA.txt");
+            using var writer = new StreamWriter(filePath);
             {
                 foreach (var discrepancia in discrepancias)
                 {
@@ -103,10 +107,6 @@ public class MatriculaService
                 }
             }
 
-            Console.WriteLine($"Arquivo de discrepâncias salvo em: {filePath}");
-        }
-        else
-        {
             Console.WriteLine("Nenhuma discrepância encontrada. Arquivo não gerado.");
         }
 

@@ -56,8 +56,13 @@ public class SecretariaService
             return;
         }
 
-        var desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-        var filePath = Path.Combine(desktopPath, "SECRETARIAS.txt");
+        var pasta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "discrepancias");
+
+        // Garante que a pasta exista
+        if (!Directory.Exists(pasta))
+            Directory.CreateDirectory(pasta);
+
+        var filePath = Path.Combine(pasta, "SECRETARIA.txt");
 
         try
         {
