@@ -11,10 +11,12 @@ namespace Servidor_V3.Controllers
     public class ArquivosController : Controller
     {
         private readonly BancoContext _bancoContext;
+        private readonly CleanupService _cleanupService;
 
-        public ArquivosController(BancoContext bancoContext)
+        public ArquivosController(BancoContext bancoContext, CleanupService cleanupService)
         {
             _bancoContext = bancoContext;
+            _cleanupService = cleanupService;
         }
 
         public IActionResult Index()
@@ -41,6 +43,7 @@ namespace Servidor_V3.Controllers
         [HttpPost]
         public async Task<IActionResult> ProcessarArquivo(IFormFile arquivoTxt, IFormFile arquivoExcel, int SelectOptionId)
         {
+            await _cleanupService.LimparTudoAsync();
             try
             {
                 if (arquivoTxt == null || arquivoTxt.Length == 0 || arquivoExcel == null || arquivoExcel.Length == 0)

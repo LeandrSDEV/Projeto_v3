@@ -5,17 +5,10 @@ using Servidor_V3.Data;
 public class ServidorService
 {
     private readonly BancoContext _context;
-    private readonly string _caminhoSaida;
 
     public ServidorService(BancoContext context)
     {
-        _context = context;
-        _caminhoSaida = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-
-        if (!Directory.Exists(_caminhoSaida))
-        {
-            Directory.CreateDirectory(_caminhoSaida);
-        }
+        _context = context;      
     }
 
     public async Task GerarEncontradoAsync()

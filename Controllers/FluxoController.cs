@@ -176,7 +176,7 @@ namespace Servidor_V3.Controllers
         { "5", "Contratado" }, { "6", "Prestador de Serviço" }, { "7", "Comissionado" },
         { "8", "Estagiario" }, { "9", "Celetista" }, { "10", "Estatutario" }, { "11", "Temporario" },
         { "12", "Beneficiario" }, { "13", "Agente Politico" }, { "14", "Aguardando Especificar" },
-        { "15", "Efetivo/Comissão" }, { "16", "Estável" }, { "17", "CConselheiro Tutelar" },
+        { "15", "Efetivo/Comissão" }, { "16", "Estável" }, { "17", "Conselheiro Tutelar" },
         { "18", "Regime Administrativo" }, { "19", "Trabalhador Avulso" }, { "20", "Pensão por Morte" },
         { "21", "Interesse Público" }, { "22", "Emprego Público" }, { "23", "Reintegração" },
         { "24", "Regime Jurídico" }, { "25", "Contratado/Comissionado" }, { "26", "Sem Categoria" },
@@ -226,6 +226,8 @@ namespace Servidor_V3.Controllers
 
             using (var transaction = await _bancoContext.Database.BeginTransactionAsync())
             {
+                bool transactionCommitted = false;
+
                 try
                 {
                     foreach (var item in NovosValores)
@@ -261,7 +263,9 @@ namespace Servidor_V3.Controllers
 
                     if (totalAlterados > 0)
                     {
+                        // Somente tenta fazer commit se a transação não foi revertida ou confirmada antes
                         await transaction.CommitAsync();
+                        transactionCommitted = true;
 
                         // Chama os serviços necessários após a alteração
                         await _servidorService.GerarEncontradoAsync();
@@ -269,22 +273,29 @@ namespace Servidor_V3.Controllers
                         await _categoriaService.GerarVinculoAsync();
                         await _secretariaService.GerarSecretariasAsync();
                         await _perfilCalculo.GeradorPerfilCalculo();
-                        await _cleanupService.LimparTabelasAsync();
 
                         return RedirectToAction("Discrepancia");
                     }
                     else
                     {
+                        // Nenhuma alteração, pode ir para a página de discrepância
                         return RedirectToAction("Discrepancia");
                     }
                 }
                 catch (Exception ex)
                 {
-                    await transaction.RollbackAsync();
+                    // Verifica se a transação não foi confirmada antes de tentar reverter
+                    if (!transactionCommitted)
+                    {
+                        await transaction.RollbackAsync();
+                    }
+
+                    // Log de erro, se necessário, para diagnóstico
                     return RedirectToAction("Discrepancia");
                 }
             }
         }
+
         public class CalculoViewModel
         {
             public string Ccoluna1Original { get; set; }
@@ -345,33 +356,5 @@ namespace Servidor_V3.Controllers
             var bytes = System.IO.File.ReadAllBytes(caminho);
             return File(bytes, "text/plain", nome);
         }
-
-        [HttpPost]
-        public IActionResult Finalizar()
-        {
-            var pastaDiscrepancias = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "discrepancias");
-
-            if (Directory.Exists(pastaDiscrepancias))
-            {
-                // Exclui todas as subpastas e seus conteúdos
-                var pastas = Directory.GetDirectories(pastaDiscrepancias);
-                foreach (var pasta in pastas)
-                {
-                    try
-                    {
-                        Directory.Delete(pasta, true); // true para deletar com conteúdo
-                    }
-                    catch (Exception ex)
-                    {
-                        // Log de erro, caso a exclusão falhe
-                        Console.WriteLine($"Erro ao deletar pasta: {ex.Message}");
-                    }
-                }
-            }
-
-            // Redireciona para a tela inicial ou outra view após excluir as pastas
-            return RedirectToAction("Index", "Home");
-        }
-
     }
 }
